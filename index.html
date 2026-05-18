@@ -40,11 +40,12 @@
     .label{font-size:11px;letter-spacing:.14em;color:#C1714A;font-weight:700;margin-bottom:10px}
     .hero{padding-top:40px}
     .h1{font-size:32px;font-weight:700;margin:0 0 8px}
-    .result-header-card{border-radius:20px;padding:36px 24px 32px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;color:#fff}
-    .result-header-bg-letter{position:absolute;font-size:200px;font-weight:900;color:rgba(255,255,255,.10);top:-40px;right:-16px;line-height:1;pointer-events:none;user-select:none}
-    .result-header-icon{width:60px;height:60px;margin:0 auto 16px;position:relative;z-index:1}
-    .result-header-eyebrow{font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.85);margin-bottom:8px;font-weight:500;position:relative;z-index:1}
-    .result-type-name{font-size:24px;font-weight:700;line-height:1.3;position:relative;z-index:1;margin:0}
+    .result-header-card{background:#fff;border:1px solid #E8D5CE;border-radius:20px;padding:12px;margin-bottom:16px;overflow:hidden}
+    .result-accent{height:8px;border-radius:999px;margin-bottom:14px}
+    .result-header-copy{padding:2px 8px 14px}
+    .result-header-eyebrow{font-size:10px;letter-spacing:.22em;color:#C1714A;margin-bottom:10px;font-weight:700}
+    .result-type-name{font-size:30px;font-weight:700;line-height:1.25;margin:0;color:#2F2119;letter-spacing:.01em}
+    .result-type-image{display:block;width:100%;height:210px;object-fit:cover;object-position:center;border-radius:16px;background:#F8F4F1}
     .share a{display:inline-block;width:48%;text-align:center;background:#1A1A1A;color:#fff;text-decoration:none;padding:12px 0;border-radius:12px}
     .site-footer{margin-top:56px;padding:28px 0 20px;text-align:center;border-top:1px solid #E8D5CE}
     .footer-logo-wrap{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;text-decoration:none}
@@ -84,10 +85,12 @@
 
     <section id="result" class="hide">
       <div class="result-header-card" id="result-header-card">
-        <div class="result-header-bg-letter" id="result-bg-letter"></div>
-        <div class="result-header-icon" id="result-icon"></div>
-        <div class="result-header-eyebrow">あなたの強みタイプ</div>
-        <h2 class="result-type-name" id="result-type-name"></h2>
+        <div class="result-accent" id="result-accent"></div>
+        <div class="result-header-copy">
+          <div class="result-header-eyebrow">あなたの強みタイプ</div>
+          <h2 class="result-type-name" id="result-type-name"></h2>
+        </div>
+        <img class="result-type-image" id="result-type-image" src="" alt="">
       </div>
       <div class="card"><div class="label">診断結果</div><div id="headline" style="font-weight:700;line-height:1.7;margin-bottom:12px"></div><div id="body" style="line-height:1.9"></div></div>
       <div class="card" style="background:#FDF0EB"><div class="label">あなたへ</div><div id="letter" style="line-height:1.9"></div></div>
@@ -112,6 +115,16 @@ const typeColors = {
   F:{gradient:'linear-gradient(135deg,#6B7280 0%,#9CA3AF 100%)'},
   G:{gradient:'linear-gradient(135deg,#059669 0%,#34D399 100%)'},
   H:{gradient:'linear-gradient(135deg,#1D4ED8 0%,#60A5FA 100%)'}
+};
+const TYPE_IMAGE = {
+  A:'type-image-A-v1.png',
+  B:'type-image-B-v1.png',
+  C:'type-image-C-v1.png',
+  D:'type-image-D-v1.png',
+  E:'type-image-E-v1.png',
+  F:'type-image-F-v1.png',
+  G:'type-image-G-v1.png',
+  H:'type-image-H-v1.png'
 };
 const typeIcons = {
   A:'<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M16 17c4 0 8 2 12 7-2 2-5 5-8 8-6-3-8-9-8-15h4z" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.9)" stroke-width="2.2"/></svg>',
@@ -159,7 +172,7 @@ function sc(id){['top','quiz','loading','result'].forEach(x=>document.getElement
 function render(){document.getElementById('ptext').textContent=`${i+1} / ${Q.length}`;document.getElementById('pbar').style.width=`${((i+1)/Q.length)*100}%`;document.getElementById('backbtn').disabled=i===0;document.getElementById('q').textContent=Q[i][0];const o=document.getElementById('opts');o.innerHTML='';Q[i][1].forEach(item=>{const b=document.createElement('button');b.className='opt';b.textContent=item[0];b.onclick=()=>{answers[i]=item[1];if(i<Q.length-1){i+=1;render();return;}sc('loading');setTimeout(show,1200);};o.appendChild(b);});}
 function start(){i=0;answers=[];sc('quiz');render();}
 function back(){if(i>0){i-=1;render();}}
-function show(){const result=calc();const main=T[result.main];ensureDynamicBlocks();document.getElementById('result-header-card').style.background=typeColors[result.main].gradient;document.getElementById('result-bg-letter').textContent=result.main;document.getElementById('result-icon').innerHTML=typeIcons[result.main];document.getElementById('result-type-name').textContent=main[0];document.getElementById('headline').textContent=main[1];document.getElementById('body').innerHTML=main[2].split('\n\n').map(p=>`<p>${p}</p>`).join('');document.getElementById('letter').textContent=main[3];document.getElementById('pres').textContent=main[4];renderNext(result.main);const affiliate=(typeof affiliateData!=='undefined'&&affiliateData&&affiliateData[result.main]&&typeof affiliateData[result.main].url==='string'&&affiliateData[result.main].url.trim()!=='')?affiliateData[result.main]:null;if(affiliate){document.getElementById('aff').classList.remove('hide');document.getElementById('affnote').textContent=AFF_HINT[result.main];document.getElementById('afft').textContent=affiliate.title;document.getElementById('affd').textContent=affiliate.desc;document.getElementById('afflink').href=affiliate.url;}else{document.getElementById('aff').classList.add('hide');}const shareText=encodeURIComponent(share(result.main));document.getElementById('sx').href=`https://twitter.com/intent/tweet?text=${shareText}`;document.getElementById('st').href=`https://www.threads.net/intent/post?text=${shareText}`;sc('result');}
+function show(){const result=calc();const main=T[result.main];ensureDynamicBlocks();document.getElementById('result-accent').style.background=typeColors[result.main].gradient;document.getElementById('result-type-name').textContent=main[0];document.getElementById('result-type-image').src=TYPE_IMAGE[result.main];document.getElementById('result-type-image').alt=`${main[0]}のイメージ画像`;document.getElementById('headline').textContent=main[1];document.getElementById('body').innerHTML=main[2].split('\n\n').map(p=>`<p>${p}</p>`).join('');document.getElementById('letter').textContent=main[3];document.getElementById('pres').textContent=main[4];renderNext(result.main);const affiliate=(typeof affiliateData!=='undefined'&&affiliateData&&affiliateData[result.main]&&typeof affiliateData[result.main].url==='string'&&affiliateData[result.main].url.trim()!=='')?affiliateData[result.main]:null;if(affiliate){document.getElementById('aff').classList.remove('hide');document.getElementById('affnote').textContent=AFF_HINT[result.main];document.getElementById('afft').textContent=affiliate.title;document.getElementById('affd').textContent=affiliate.desc;document.getElementById('afflink').href=affiliate.url;}else{document.getElementById('aff').classList.add('hide');}const shareText=encodeURIComponent(share(result.main));document.getElementById('sx').href=`https://twitter.com/intent/tweet?text=${shareText}`;document.getElementById('st').href=`https://www.threads.net/intent/post?text=${shareText}`;sc('result');}
 function resetQuiz(){sc('top');}
   </script>
 </body>
